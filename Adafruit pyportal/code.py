@@ -16,6 +16,8 @@ on titano
 76 columns (usefull for PRINTAT)
 
 Modified by David Glaude 2021 For Adafruit PyPortal
+17 lines of text
+50 columns (usefull for PRINTAT)
 """
 
 from basictoken import BASICToken as Token
