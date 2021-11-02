@@ -43,7 +43,7 @@ ts = adafruit_touchscreen.Touchscreen(
     board.TOUCH_YD,
     board.TOUCH_YU,
     calibration=((5200, 59000), (5800, 57000)),
-    size=(480, 320),
+    size=(320, 240),
 )
 note = {'C1':32,
     'C#1':34,
@@ -68,7 +68,7 @@ note = {'C1':32,
     'G#2':103,
     'A2':110,
     'A#2':116,
-    'B2':123,    
+    'B2':123,
     'C3':131,
     'C#3':138,
     'D3':146,
@@ -80,7 +80,7 @@ note = {'C1':32,
     'G#3':207,
     'A3':220,
     'A#3':233,
-    'B3':247,    
+    'B3':247,
     'C4':261,
     'C#4':277,
     'D4':293,
@@ -337,7 +337,7 @@ class BASICParser:
         elif self.__token.category == Token.FSEEK:
             self.__fseekstmt()
             return None
-#BeBoX new commands add on calls ********************************************************        
+#BeBoX new commands add on calls ********************************************************
         elif self.__token.category == Token.NEOPIXEL:
             self.__neopixel()
             return None
@@ -501,8 +501,8 @@ class BASICParser:
         self.__expr()
         borderstroke = self.__operand_stack.pop()
         ligne = RoundRect(x0,y0,width,height,radius,fill=fillcolor,outline=outlinecolor,stroke=borderstroke)
-        graphic.append(ligne)        
-        
+        graphic.append(ligne)
+
     def __gcircle(self):
         self.__advance()
         self.__expr()
@@ -524,7 +524,7 @@ class BASICParser:
         borderstroke = self.__operand_stack.pop()
         ligne = Circle(x0,y0,radius,fill=fillcolor,outline=outlinecolor,stroke=borderstroke)
         graphic.append(ligne)
-        
+
     def __gtriangle(self):
         self.__advance()
         self.__expr()
@@ -551,8 +551,8 @@ class BASICParser:
         self.__expr()
         outlinecolor = self.__operand_stack.pop()
         ligne = Triangle(x0,y0,x1,y1,x2,y2,fill=fillcolor,outline=outlinecolor)
-        graphic.append(ligne)        
-        
+        graphic.append(ligne)
+
     def __gscreen(self):
         #if on display.show(graphic)
         #if off display.show(None)
@@ -573,7 +573,7 @@ class BASICParser:
                     graphic.pop()
                 except:
                     pass
-        
+
         try:
             self.__advance()
             self.__expr()
@@ -584,10 +584,10 @@ class BASICParser:
                 graphic.append(background)
         except:
             pass
-            
+
     def __play(self):
         if len(self.__tokenlist)==3:
-            self.__advance() # bypass BEEP 
+            self.__advance() # bypass BEEP
             self.__expr()    # compute value
             freq = str(self.__operand_stack.pop()).upper() # put in freq and pop
             #print(freq)
@@ -608,7 +608,7 @@ class BASICParser:
         else:
             print("Missing parameters ? \nSyntax is BEEP Freq Time")
     def __wav(self):
-            self.__advance() # bypass BEEP 
+            self.__advance() # bypass BEEP
             self.__expr()    # compute value
             filename = self.__operand_stack.pop()
             speaker_enable = digitalio.DigitalInOut(board.SPEAKER_ENABLE)
@@ -622,10 +622,10 @@ class BASICParser:
             wav.deinit()
             a.deinit()
             speaker_enable.deinit()
-            
+
     def __beep(self):
         if len(self.__tokenlist)==3:
-            self.__advance() # bypass BEEP 
+            self.__advance() # bypass BEEP
             self.__expr()    # compute value
             freq = self.__operand_stack.pop() # put in freq and pop
             self.__expr()    # compute value
@@ -646,23 +646,23 @@ class BASICParser:
     def __neopixel(self):
         #print("token list : "+str(len(self.__tokenlist)))
         if len(self.__tokenlist)==4:
-            self.__advance() # bypass NEOTPIXEL 
+            self.__advance() # bypass NEOTPIXEL
             self.__expr()    # compute value
             r = self.__operand_stack.pop() # put in r and pop
             self.__expr()    # compute value
-            g = self.__operand_stack.pop() # put in g and pop 
+            g = self.__operand_stack.pop() # put in g and pop
             self.__expr()    # compute value
             b = self.__operand_stack.pop() # put in b and pop
             pixels[0]=(r,g,b)
         else:
             print("Missing parameters ? \nSyntax is NEOPIXEL R G B")
-            
+
     def __pause(self):
         self.__advance()
         self.__expr()
         p = self.__operand_stack.pop()
         time.sleep(p)
-    
+
     def __cls(self):
         print(chr(27)+"[2J")
 
@@ -680,7 +680,7 @@ class BASICParser:
             print(string, end="")
         else:
             print("Missing parameters ? \nSyntax is PRINTAT x y String$")
-            
+
 
     def __printstmt(self):
         """Parses a PRINT statement, causing
@@ -1725,7 +1725,7 @@ class BASICParser:
             # Zero returns the last value again (not implemented)
             # Any positive value returns random fload btw 0 and 1
             print(arg)
-            
+
             if arg < 0:
                 random.seed(arg)
 
@@ -1761,21 +1761,21 @@ class BASICParser:
             return None
         if category == Token.LIGHT:
             return light.value
-        
+
         if category == Token.TOUCHX:
             p = ts.touch_point
             if p and p[0]!=0:
                 return p[0]
             else:
                 return -1
-            
+
         if category == Token.TOUCHY:
             p = ts.touch_point
             if p and p[0]!=0:
                 return p[1]
             else:
                 return -1
-            
+
         if category == Token.GETTOUCH:
             p = ts.touch_point
             pressed = False
@@ -1784,7 +1784,7 @@ class BASICParser:
                 if p and p[0]!=0:
                     pressed =True
             return str(p[0])+","+str(p[1])
-        
+
         if category == Token.RNDINT:
             self.__consume(Token.LEFTPAREN)
 

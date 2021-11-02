@@ -14,6 +14,8 @@ Modified by BeBoX. 2021 for Adafruit titano
 on titano
 23 lines of text
 76 columns (usefull for PRINTAT)
+
+Modified by David Glaude 2021 For Adafruit PyPortal
 """
 
 from basictoken import BASICToken as Token
@@ -32,17 +34,19 @@ try:
         pass
 except:
     print("i2c init problem ...")
-    
+
 try:
-    cardkb = i2c.scan()[0]  # should return 95
-    if cardkb != 95:
+    cardkb = i2c.scan()  # should return a list with a 95 in
+    if 95 in cardkb:     # This trick should work both on PyPortal Titano and
+        cardkb = 95      # and simple PyPortal (that has and additional ADT7410 on I2C bus)
+    else:
         print("!!! Check I2C config: " + str(i2c))
         print("!!! CardKB not found. I2C device", cardkb,
               "found instead.")
         exit(1)
 except:
     i2ckeyboard=False
-    
+
 ESC = chr(27)
 NUL = '\x00'
 CR = "\r"
@@ -57,12 +61,12 @@ b = bytearray(1)
 
 def ReadKey():
     c = ''
-    i2c.readfrom_into(cardkb, b)    
+    i2c.readfrom_into(cardkb, b)
     try:
         c = b.decode()
     except:
         c = b
-           
+
     if c == CR:
         # convert CR return key to LF
         c = LF
@@ -98,7 +102,7 @@ def InputFromKB(prompt):
                             print(chr(27)+"["+str(tmp)+"D", end="")
                             print(" "*20, end="")
                             print(chr(27)+"[2K", end="")
-                            print(chr(27)+"[20D", end="")                            
+                            print(chr(27)+"[20D", end="")
                             print(datainput, end="")
                     elif key==b'\xb6':
                         #key down
@@ -113,7 +117,7 @@ def InputFromKB(prompt):
                             print(chr(27)+"["+str(tmp)+"D", end="")
                             print(" "*40, end="")
                             print(chr(27)+"[2K", end="")
-                            print(chr(27)+"[40D", end="")                            
+                            print(chr(27)+"[40D", end="")
                             print(datainput, end="")
                     elif key == b'\xb7':
                         #right
@@ -131,7 +135,7 @@ def InputFromKB(prompt):
                             else:
                                 print(" ", end="")
                                 print(chr(27)+"[1D", end="")
-                                
+
                     elif key == b'\xb4':
                         #left
                         curseur-=1
@@ -141,7 +145,7 @@ def InputFromKB(prompt):
                             print(chr(27)+"[1D", end="")
                             print(" "+datainput[-(len(datainput)-curseur):], end="")
                             print(chr(27)+"["+str((len(datainput)-curseur)+1)+"D", end="")
-                    else:                            
+                    else:
                         print(key, end='')
                         if key!='\x08':
                             if curseur==len(datainput):
@@ -169,7 +173,7 @@ def InputFromKB(prompt):
                                 print(chr(27)+"["+str(len(end)+1)+"D", end="")
                                 datainput=first+end
                                 curseur=curseur-1
-    
+
 
     buffer[bufidx]=datainput
     #bufidx = len(buffer)
@@ -182,35 +186,38 @@ def main():
 
     banner = (
     """
-    ___  _                 _  _    _ __  _  _  _    _               
-   / __|(_) _ _  __  _  _ (_)| |_ | '_ \| || || |_ | |_   ___  _ _  
-  | (__ | || '_|/ _|| || || ||  _|| .__/ \_. ||  _||   \ / _ \| ' \ 
-   \___||_||_|  \__| \_._||_| \__||_|    |__/  \__||_||_|\___/|_||_|
-           ___  _  _  ___            _                  
-          | _ \| || || _ ) __ _  ___(_) __              
-          |  _/ \_. || _ \/ _` |(_-/| |/ _|        _    
-          |_|   |__/ |___/\__/_|/__/|_|\__|       (_)   
-  _________________________________________________________________ 
-  \____\____\____\____\____\____\____\____\____\____\____\____\____\ 
-                                                                  
+   ___  _                 _  _
+  / __|(_) _ _  __  _  _ (_)| |_
+ | (__ | || '_|/ _|| || || ||  _|
+  \___||_||_|  \__| \_._||_| \__|
+   _ __  _  _  _    _
+  | '_ \| || || |_ | |_   ___  _ _
+  | .__/ \_. ||  _||   \ / _ \| ' \\
+  |_|    |__/  \__||_||_|\___/|_||_|
+    ___  _  _  ___            _
+   | _ \| || || _ ) __ _  ___(_) __
+   |  _/ \_. || _ \/ _` |(_-/| |/ _|
+   |_|   |__/ |___/\__/_|/__/|_|\__|
+  ___________________________________
+  \____\____\____\____\____\____\____\\
 """)
     print(chr(27)+"[2J")
     print(banner)
-    print("        Adafruit PyPortal Titano Edition by BeBoX (c)2021\r\n")
+    print(" Adafruit PyPortal Edition by David Glaude (c)2021")
     lexer = Lexer()
     program = Program()
-    
+
     # check if system is Read only
     RO=False
-    
-    
+
+
     # Continuously accept user input and act on it until
     # the user enters 'EXIT'
     while True:
         if i2ckeyboard==True:
             stmt = InputFromKB(chr(187)+' ')
         else:
-            stmt = input(chr(187)+' ')
+            stmt = input(chr(187)+' ') ### FIX ME: EOFError when no i2ckeyboard connected
         #if no i2c keyboard take input from PC
 
         try:
@@ -278,10 +285,10 @@ def main():
                 # Delete the program from memory
                 elif tokenlist[0].category == Token.NEW:
                     program.delete()
-                    
+
                 elif tokenlist[0].category == Token.DIR:
                     print("directory of ",end="")
-                    path="/"                    
+                    path="/"
                     try:
                         path+=tokenlist[1].lexeme
                     except:
@@ -294,7 +301,7 @@ def main():
                             count+=1
                             print(n)
                     print("Found " + str(count) + " files.")
-                    
+
 
                 # Unrecognised input
                 else:
@@ -306,7 +313,7 @@ def main():
         except Exception as e:
             print("Error : ", end="")
             print(e, file=stderr, flush=False)
-            
+
 
 
 if __name__ == "__main__":
